@@ -1,0 +1,54 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:17
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: ecommerceDB
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
+      PGADMIN_DEFAULT_PASSWORD: pgadmin
+      PGADMIN_LISTEN_PORT: 5050
+      PGADMIN_CONFIG_SERVER_MODE: 'True'  # Single-user mode
+      PGADMIN_CONFIG_FORCE_HTTPS: 'True'   # Enable HTTPS
+    ports:
+      - "5050:5050"
+    depends_on:
+      - postgres
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./src/main/resources/server.crt:/certs/server.crt  # Mount SSL cert
+      - ./src/main/resources/server.key:/certs/server.key  # Mount SSL key
+    command:
+      - /usr/local/bin/entrypoint.sh
+      - "--certfile=/certs/server.crt"  # Use mounted cert for HTTPS
+      - "--keyfile=/certs/server.key"   # Use mounted key for HTTPS
+
+  app:
+    build:
+      context: .
+    container_name: ecommerce_app
+    ports:
+      - "8181:8181"
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/ecommerceDB
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: admin
+      SERVER_SSL_KEY_STORE_PASSWORD: secret2025
+      SERVER_SSL_KEY_PASSWORD: secret2025
+
+volumes:
+  pgdata:
+  pgadmin_data:
