@@ -1,6 +1,6 @@
 import { InjectionToken, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
+import { of } from 'rxjs';
 import { AppComponent } from './app.component';
 import { ProductListComponent } from './components/product-list/product-list.component';
 import { HttpClientModule, HttpInterceptor, HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -79,12 +79,8 @@ const routes: Routes = [
     NgbModule,
     ReactiveFormsModule,
     OktaAuthModule,
-
-
-
-
-
   ],
+
   providers: [ProductService, {
     provide: OKTA_CONFIG,
     useFactory: () => {

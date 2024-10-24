@@ -8,10 +8,10 @@ export class CartItem {
   quantity: number;
 
   constructor(product: Product) {
-    this.id = product.id;
+    this.id = product.id || "default-id"; // Use a default value or handle the case
     this.name = product.name;
     this.imageUrl = product.imageUrl;
     this.unitPrice = product.unitPrice;
-    this.quantity = 1;
+    this.quantity = 1; // Default quantity to 1
   }
 }

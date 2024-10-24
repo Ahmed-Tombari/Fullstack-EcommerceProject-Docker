@@ -57,12 +57,12 @@
            <div class="col-md-3 mt-2" style="text-align: right;">
               <span class="mr-2">Page Size</span>
 
-              <select (change)="updatePageSize($event.target.value)">
-                <option>2</option>
-                <option selected="true">6</option>
-                <option>10</option>
-                <option>20</option>
-                <option>50</option>
+              <select (change)="updatePageSize($event)">
+                <option value="2">2</option>
+                <option value="6" selected="true">6</option>
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
               </select>
            </div>
 

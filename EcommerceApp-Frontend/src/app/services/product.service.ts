@@ -1,8 +1,8 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';  // Import 'of' here
 import { Product } from '../common/product';
-import { map } from 'rxjs/operators';
+import { map, catchError } from 'rxjs/operators';
 import { ProductCategory } from '../common/product-category';
 import { environment } from 'src/environments/environment';
 
@@ -17,89 +17,102 @@ export class ProductService {
   constructor(private httpClient: HttpClient) { }
 
   getProductList(theCategoryId: number): Observable<Product[]> {
+    const searchUrl = `${this.baseUrl}/search/findByCategoryId`;
 
-// need to build URL based on category "id"
-const searchUrl = `${this.baseUrl}/search/findByCategoryId?id=${theCategoryId}`;
+    const params = new HttpParams().set('id', theCategoryId.toString());
 
-    return this.getProducts(searchUrl);
-   /* return this.httpClient.get<GetResponseProducts>(searchUrl).pipe(
-      map(response => response._embedded.products)
-    );*/
+    return this.httpClient.get<GetResponseProducts>(searchUrl, { params }).pipe(
+      map(response => response._embedded.products),
+      catchError(this.handleError<Product[]>('getProductList', []))
+    );
   }
 
-  getProductListPaginate(thePage: number, thePageSize: number, theCategoryId:number): Observable<GetResponseProducts> {
+  getProductListPaginate(thePage: number, thePageSize: number, theCategoryId: number): Observable<GetResponseProducts> {
+    const searchUrl = `${this.baseUrl}/search/findByCategoryId`;
+    
+    const params = new HttpParams()
+      .set('id', theCategoryId.toString())
+      .set('page', thePage.toString())
+      .set('size', thePageSize.toString());
 
-    // need to build URL based on category "id" page and size
-    const searchUrl = `${this.baseUrl}/search/findByCategoryId?id=${theCategoryId}`
-                    + `&page=${thePage}&size=${thePageSize}`;
+    return this.httpClient.get<GetResponseProducts>(searchUrl, { params }).pipe(
+      catchError(this.handleError<GetResponseProducts>('getProductListPaginate'))
+    );
+  }
 
-        return this.httpClient.get<GetResponseProducts>(searchUrl);
-       /* return this.httpClient.get<GetResponseProducts>(searchUrl).pipe(
-          map(response => response._embedded.products)
-        );*/
-      }
-
-
-// need to build URL based on the "keyword"
-searchProducts(theKeyword: string): Observable<Product[]> {
+  searchProducts(theKeyword: string): Observable<Product[]> {
     const searchUrl = `${this.baseUrl}/search/findByNameContaining?name=${theKeyword}`;
 
     return this.getProducts(searchUrl);
   }
 
+  searchProductsPaginate(thePage: number, thePageSize: number, theKeyword: string): Observable<GetResponseProducts> {
+    const searchUrl = `${this.baseUrl}/search/findByNameContaining?name=${theKeyword}`;
+    
+    const params = new HttpParams()
+      .set('page', thePage.toString())
+      .set('size', thePageSize.toString());
 
-  searchProductsPaginate(thePage: number,
-                         thePageSize: number,
-                         theKeyword:string): Observable<GetResponseProducts> {
-
-    // need to build URL based on category "id" page and size
-    const searchUrl = `${this.baseUrl}/search/findByNameContaining?name=${theKeyword}`
-                    + `&page=${thePage}&size=${thePageSize}`;
-
-    return this.httpClient.get<GetResponseProducts>(searchUrl);
+    return this.httpClient.get<GetResponseProducts>(searchUrl, { params }).pipe(
+      catchError(this.handleError<GetResponseProducts>('searchProductsPaginate'))
+    );
   }
 
   private getProducts(searchUrl: string): Observable<Product[]> {
     return this.httpClient.get<GetResponseProducts>(searchUrl).pipe(
-      map(response => response._embedded.products)
+      map(response => response._embedded.products),
+      catchError(this.handleError<Product[]>('getProducts', []))
     );
   }
 
-
-  //need to build URL based on category "name"
   getProductCategories(): Observable<ProductCategory[]> {
+    return this.httpClient.get<GetResponseProductCategories>(this.categoryUrl).pipe(
+      map(response => response._embedded.productCategory),
+      catchError(this.handleError<ProductCategory[]>('getProductCategories', []))
+    );
+  }
 
-    // need to build URL based on category "id"
+  getProduct(theProductId: number): Observable<Product> {
+    const productUrl = `${this.baseUrl}/${theProductId}`;
 
-        return this.httpClient.get<GetResponseProductCategory>(this.categoryUrl).pipe(
-          map(response => response._embedded.productCategory)
-        );
-      }
+    return this.httpClient.get<Product>(productUrl).pipe(
+      catchError(this.handleError<Product>('getProduct'))
+    );
+  }
 
-      getProduct(theProductId: number): Observable<Product>{
-
-        // need to build URL based on category "id"
-        const productUrl = `${this.baseUrl}/${theProductId}`;
-
-        return this.httpClient.get<Product>(productUrl);
-      }
+  private handleError<T>(operation = 'operation', result?: T) {
+    return (error: any): Observable<T> => {
+      console.error(`${operation} failed: ${error.message}`);
+      return of(result as T);  // 'of' is used to return an observable
+    };
+  }
 }
+export interface ProductResponse {
+  _embedded: {
+    products: Product[]; // Assuming Product is already defined elsewhere
+  };
+  page: {
+    number: number;
+    size: number;
+    totalElements: number;
+  };
+}
+
+
 interface GetResponseProducts {
   _embedded: {
-  products: Product[];
-  },
+    products: Product[];
+  };
   page: {
-    size: number,
-    totalElements: number,
-    totalPages: number,
-    number: number
-  }
+    size: number;
+    totalElements: number;
+    totalPages: number;
+    number: number;
+  };
 }
 
-  interface GetResponseProductCategory {
-    _embedded: {
-      productCategory: ProductCategory[];
-    }
-  }
-
-
+interface GetResponseProductCategories {
+  _embedded: {
+    productCategory: ProductCategory[];
+  };
+}

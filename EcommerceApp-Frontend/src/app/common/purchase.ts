@@ -9,4 +9,12 @@ export class Purchase {
   billingAddress: Address;
   order: Order;
   orderItems: Orderitem[];
+
+  constructor(purchase?: Partial<Purchase>) {
+    this.customer = purchase?.customer || new Customer();
+    this.shippingAddress = purchase?.shippingAddress || new Address();
+    this.billingAddress = purchase?.billingAddress || new Address();
+    this.order = purchase?.order || new Order();
+    this.orderItems = purchase?.orderItems || [];
+  }
 }

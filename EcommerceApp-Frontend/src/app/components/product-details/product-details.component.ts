@@ -23,26 +23,32 @@ export class ProductDetailsComponent implements OnInit {
   }
 
   handleProductDetails() {
+    // Get the "id" param string
+    const idParam = this.route.snapshot.paramMap.get('id');
 
-  // get the "id" param string. convert string to a number using the "+" symbol
-  const theProductId: number = +this.route.snapshot.paramMap.get('id');
+    // Check if idParam is not null
+    if (idParam !== null) {
+      const theProductId: number = +idParam; // Convert string to number
 
-// get products for the given category "id"
-this.productService.getProduct(theProductId).subscribe(
-  data => {
-    this.product = data;
+      // Get the product for the given ID
+      this.productService.getProduct(theProductId).subscribe(
+        data => {
+          this.product = data;
+        },
+        error => {
+          console.error('Error fetching product details', error);
+          // Handle error (e.g., redirect or show an error message)
+        }
+      );
+    } else {
+      console.error('Product ID not found in the route parameters.');
+      // Handle the case where the ID is not found (e.g., redirect)
+    }
   }
 
-  )
-}
-
   addToCart() {
-
     console.log(`Adding to cart: ${this.product.name}, ${this.product.unitPrice}`);
     const theCartItem = new CartItem(this.product);
     this.cartService.addToCart(theCartItem);
-
   }
-
 }
-

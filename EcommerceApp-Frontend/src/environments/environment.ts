@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   appBaseHref: '/',
-  shopApiUrl: "https://localhost:9898/api",
+  shopApiUrl: "https://localhost:8181/api",
   stripePublishableKey: "pk_test_51KVe6MCJnbnss7sPeWbLs742bvkfBVJFcExjJQkY6jrMqgWDN76pOoeBGnt0kVYyxcDeD8FFGXld4pFJe60Gj6BV00tUtgw084"
 };
 

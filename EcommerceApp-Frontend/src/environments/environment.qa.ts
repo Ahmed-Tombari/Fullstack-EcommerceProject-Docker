@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   appBaseHref: '/',
-  shopApiUrl: "https://localhost:9898/api"
+  shopApiUrl: "https://localhost:8181/api"
 };
 
 /*
@@ -16,3 +16,4 @@ export const environment = {
  * on performance if an error is thrown.
  */
 // import 'zone.js/dist/zone-error';  // Included with Angular CLI.
+ 

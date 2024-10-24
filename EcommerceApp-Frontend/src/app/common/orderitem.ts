@@ -1,3 +1,4 @@
+// orderitem.ts
 import { CartItem } from "./cart-item";
 
 export class Orderitem {
@@ -6,10 +7,10 @@ export class Orderitem {
   quantity: number;
   productId: string;
 
-  constructor(cartItem: CartItem) {
-    this.imageUrl = cartItem.imageUrl;
-    this.quantity = cartItem.quantity;
-    this.unitPrice = cartItem.unitPrice;
-    this.productId = cartItem.id;
+  constructor(orderitem: Partial<Orderitem>) {
+    this.imageUrl = orderitem.imageUrl || ''; // Provide a default value
+    this.quantity = orderitem.quantity || 0; // Provide a default value
+    this.unitPrice = orderitem.unitPrice || 0; // Provide a default value
+    this.productId = orderitem.productId || ''; // Provide a default value
   }
 }
